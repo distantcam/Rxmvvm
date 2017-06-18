@@ -7,15 +7,24 @@
     <Description>Simple MVVM with Reactive Extensions</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageTags>MVVM Reactive rx</PackageTags>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="gitversiontask" Version="3.6.5" />
+    <PackageReference Include="gitversiontask" Version="3.6.5">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="System.Reactive" Version="3.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="PresentationCore" />
   </ItemGroup>
+
+  <Target Name="SetPackageVersion" BeforeTargets="CoreCompile" DependsOnTargets="GetVersion" Condition="$(GetVersion) == 'true'">
+    <PropertyGroup>
+      <PackageVersion>$(GitVersion_NuGetVersion)</PackageVersion>
+    </PropertyGroup>
+  </Target>
 
 </Project>

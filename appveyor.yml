@@ -1,0 +1,11 @@
+skip_tags: true
+
+configuration: Release
+
+image: Visual Studio 2017
+
+before_build:
+  - nuget restore src\Rxmvvm.sln
+
+artifacts:
+  - path: '**\*.nupkg'
