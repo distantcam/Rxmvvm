@@ -19,10 +19,12 @@ namespace Rxmvvm
         private IObservable<PropertyChangingData> whenChanging;
         private IObservable<DataErrorChanged> whenErrorChanged;
 
-        private volatile int disposeSignaled;
+        private CompositeDisposable disposables;
 
         public BindableObject()
         {
+            disposables = new CompositeDisposable();
+
             changed = new Subject<PropertyChangedData>();
             whenChanged = changed.AsObservable();
             whenChanged.ObserveOn(Schedulers.MainScheduler)
@@ -73,28 +75,15 @@ namespace Rxmvvm
 
         public virtual void Dispose()
         {
-            if (Interlocked.Exchange(ref disposeSignaled, 1) != 0)
-            {
-                return;
-            }
-            if (changing != null)
-            {
-                changing.OnCompleted();
-                changing.Dispose();
-                changing = null;
-            }
-            if (changed != null)
-            {
-                changed.OnCompleted();
-                changed.Dispose();
-                changed = null;
-            }
-            if (errorChanged != null)
-            {
-                errorChanged.OnCompleted();
-                errorChanged.Dispose();
-                errorChanged = null;
-            }
+            Interlocked.Exchange(ref disposables, null)?.Dispose();
+            Interlocked.Exchange(ref changing, null)?.OnCompleted();
+            Interlocked.Exchange(ref changed, null)?.OnCompleted();
+            Interlocked.Exchange(ref errorChanged, null)?.OnCompleted();
+        }
+
+        public void AddChildDisposable(IDisposable subscription)
+        {
+            disposables.Add(subscription);
         }
 
         protected void OnPropertyChanged(string propertyName, object before, object after)
