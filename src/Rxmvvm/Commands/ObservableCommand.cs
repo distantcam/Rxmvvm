@@ -3,11 +3,13 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Rxmvvm.Commands
 {
     internal class ObservableCommand : IObservableCommand, IRaiseCanExecuteChanged
     {
+        private EventHandler canExecuteChanged;
         private Func<object, Task> action;
         private IDisposable canExecuteSubscription;
         private bool latest;
@@ -26,7 +28,11 @@ namespace Rxmvvm.Commands
                 });
         }
 
-        public event EventHandler CanExecuteChanged;
+        event EventHandler ICommand.CanExecuteChanged
+        {
+            add { canExecuteChanged += value; }
+            remove { canExecuteChanged -= value; }
+        }
 
         public bool CanExecute(object parameter) => !isExecuting && latest;
 
@@ -34,7 +40,7 @@ namespace Rxmvvm.Commands
 
         public void RaiseCanExecuteChanged()
         {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            canExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void Dispose()

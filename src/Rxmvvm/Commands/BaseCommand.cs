@@ -5,8 +5,9 @@ using System.Windows.Input;
 
 namespace Rxmvvm.Commands
 {
-    internal abstract class BaseCommand<T> : IRaiseCanExecuteChanged
+    internal abstract class BaseCommand<T> : IRaiseCanExecuteChanged, ICommand
     {
+        private EventHandler canExecuteChanged;
         private readonly Func<T, bool> canExecuteMethod;
         private SemaphoreSlim isExecuting = new SemaphoreSlim(1);
 
@@ -15,15 +16,15 @@ namespace Rxmvvm.Commands
             this.canExecuteMethod = canExecuteMethod;
         }
 
-        public event EventHandler CanExecuteChanged
+        event EventHandler ICommand.CanExecuteChanged
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            add { canExecuteChanged += value; }
+            remove { canExecuteChanged -= value; }
         }
 
         public void RaiseCanExecuteChanged()
         {
-            CommandManager.InvalidateRequerySuggested();
+            canExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public bool CanExecute(T parameter)
@@ -35,6 +36,11 @@ namespace Rxmvvm.Commands
 
             return canExecuteMethod(parameter);
         }
+
+        bool ICommand.CanExecute(object parameter) => CanExecute((T)parameter);
+        void ICommand.Execute(object parameter) => throw new NotImplementedException();
+
+        protected abstract void Execute(object parameter);
 
         protected IDisposable StartExecuting()
         {

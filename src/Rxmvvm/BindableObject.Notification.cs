@@ -4,10 +4,9 @@ using System.Threading;
 
 namespace Rxmvvm
 {
-    partial class BindableObject : INotifyPropertyChanged, INotifyPropertyChanging
+    partial class BindableObject : INotifyPropertyChanged
     {
         private PropertyChangedEventHandler propertyChanged;
-        private PropertyChangingEventHandler propertyChanging;
 
         event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
         {
@@ -31,32 +30,6 @@ namespace Rxmvvm
                     handler2 = newEvent;
                     var handler3 = (PropertyChangedEventHandler)Delegate.Remove(handler2, value);
                     Interlocked.CompareExchange(ref propertyChanged, handler3, handler2);
-                } while (newEvent != handler2);
-            }
-        }
-
-        event PropertyChangingEventHandler INotifyPropertyChanging.PropertyChanging
-        {
-            add
-            {
-                PropertyChangingEventHandler handler2;
-                var newEvent = propertyChanging;
-                do
-                {
-                    handler2 = newEvent;
-                    var handler3 = (PropertyChangingEventHandler)Delegate.Combine(handler2, value);
-                    Interlocked.CompareExchange(ref propertyChanging, handler3, handler2);
-                } while (newEvent != handler2);
-            }
-            remove
-            {
-                PropertyChangingEventHandler handler2;
-                var newEvent = propertyChanging;
-                do
-                {
-                    handler2 = newEvent;
-                    var handler3 = (PropertyChangingEventHandler)Delegate.Remove(handler2, value);
-                    Interlocked.CompareExchange(ref propertyChanging, handler3, handler2);
                 } while (newEvent != handler2);
             }
         }

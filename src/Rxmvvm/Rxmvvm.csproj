@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Rxmvvm</PackageId>
     <Authors>Cameron MacFarland</Authors>
     <Description>Simple MVVM with Reactive Extensions</Description>
@@ -15,10 +15,6 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Reactive" Version="3.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
   </ItemGroup>
 
   <Target Name="SetPackageVersion" BeforeTargets="CoreCompile" DependsOnTargets="GetVersion" Condition="$(GetVersion) == 'true'">

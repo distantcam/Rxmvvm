@@ -36,11 +36,6 @@ namespace Rxmvvm
         IObservable<PropertyChangedData> Changed { get; }
     }
 
-    public interface IObservablePropertyChanging
-    {
-        IObservable<PropertyChangingData> Changing { get; }
-    }
-
     public interface IRaiseCanExecuteChanged
     {
         void RaiseCanExecuteChanged();

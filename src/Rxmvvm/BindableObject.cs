@@ -7,16 +7,14 @@ using System.Threading;
 
 namespace Rxmvvm
 {
-    public partial class BindableObject : IObservablePropertyChanged, IObservablePropertyChanging, IObservableDataErrorInfo, IDisposable
+    public partial class BindableObject : IObservablePropertyChanged, IObservableDataErrorInfo, IDisposable
     {
         private long changeNotificationSuppressionCount;
 
         private Subject<PropertyChangedData> changed;
-        private Subject<PropertyChangingData> changing;
         private Subject<DataErrorChanged> errorChanged;
 
         private IObservable<PropertyChangedData> whenChanged;
-        private IObservable<PropertyChangingData> whenChanging;
         private IObservable<DataErrorChanged> whenErrorChanged;
 
         private CompositeDisposable disposables;
@@ -31,14 +29,6 @@ namespace Rxmvvm
                 .Subscribe(args =>
                 {
                     propertyChanged?.Invoke(this, new PropertyChangedEventArgs(args.PropertyName));
-                });
-
-            changing = new Subject<PropertyChangingData>();
-            whenChanging = changing.AsObservable();
-            whenChanging.ObserveOn(Schedulers.MainScheduler)
-                .Subscribe(args =>
-                {
-                    propertyChanging?.Invoke(this, new PropertyChangingEventArgs(args.PropertyName));
                 });
 
             errorChanged = new Subject<DataErrorChanged>();
@@ -61,8 +51,6 @@ namespace Rxmvvm
 
         IObservable<PropertyChangedData> IObservablePropertyChanged.Changed => whenChanged;
 
-        IObservable<PropertyChangingData> IObservablePropertyChanging.Changing => whenChanging;
-
         IObservable<DataErrorChanged> IObservableDataErrorInfo.ErrorsChanged => whenErrorChanged;
 
         public bool ChangeNotificationEnabled => Interlocked.Read(ref changeNotificationSuppressionCount) == 0L;
@@ -76,7 +64,6 @@ namespace Rxmvvm
         public virtual void Dispose()
         {
             Interlocked.Exchange(ref disposables, null)?.Dispose();
-            Interlocked.Exchange(ref changing, null)?.OnCompleted();
             Interlocked.Exchange(ref changed, null)?.OnCompleted();
             Interlocked.Exchange(ref errorChanged, null)?.OnCompleted();
         }
@@ -92,20 +79,10 @@ namespace Rxmvvm
                 changed.OnNext(new PropertyChangedData(propertyName, before, after));
         }
 
-        protected void OnPropertyChanging(string propertyName, object before)
-        {
-            if (ChangeNotificationEnabled)
-                changing.OnNext(new PropertyChangingData(propertyName, before));
-        }
-
-        public void SetDataError(string propertyName, string error)
-        {
+        public void SetDataError(string propertyName, string error) =>
             errorChanged.OnNext(new DataErrorChanged(propertyName, error));
-        }
 
-        public void ResetDataError(string propertyName)
-        {
+        public void ResetDataError(string propertyName) =>
             errorChanged.OnNext(new DataErrorChanged(propertyName, ""));
-        }
     }
 }

@@ -10,9 +10,7 @@ namespace Rxmvvm
     {
         public static void RaiseCanExecuteChanged(this System.Windows.Input.ICommand command)
         {
-            var canExecuteChanged = command as IRaiseCanExecuteChanged;
-
-            if (canExecuteChanged != null)
+            if (command is IRaiseCanExecuteChanged canExecuteChanged)
                 canExecuteChanged.RaiseCanExecuteChanged();
         }
 

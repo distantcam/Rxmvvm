@@ -16,15 +16,9 @@ namespace Rxmvvm.Commands
 
         public DelegateCommand(Action<T> executeMethod, Func<T, bool> canExecuteMethod = null) : base(canExecuteMethod)
         {
-            if (executeMethod == null)
+            this.executeMethod = executeMethod ??
                 throw new ArgumentNullException(nameof(executeMethod), $"{nameof(executeMethod)} is null.");
-
-            this.executeMethod = executeMethod;
         }
-
-        bool ICommand.CanExecute(object parameter) => CanExecute((T)parameter);
-
-        void ICommand.Execute(object parameter) => Execute((T)parameter);
 
         public void Execute(T parameter)
         {
@@ -33,5 +27,7 @@ namespace Rxmvvm.Commands
                 executeMethod(parameter);
             }
         }
+
+        protected override void Execute(object parameter) => Execute((T)parameter);
     }
 }

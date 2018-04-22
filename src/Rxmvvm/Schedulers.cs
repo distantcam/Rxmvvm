@@ -6,7 +6,7 @@ namespace Rxmvvm
     {
         static Schedulers()
         {
-            MainScheduler = DispatcherScheduler.Current;
+            MainScheduler = CurrentThreadScheduler.Instance;
             BackgroundScheduler = TaskPoolScheduler.Default;
         }
 

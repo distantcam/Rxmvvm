@@ -17,15 +17,9 @@ namespace Rxmvvm.Commands
 
         public AwaitableDelegateCommand(Func<T, Task> executeMethod, Func<T, bool> canExecuteMethod = null) : base(canExecuteMethod)
         {
-            if (executeMethod == null)
+            this.executeMethod = executeMethod ??
                 throw new ArgumentNullException(nameof(executeMethod), $"{nameof(executeMethod)} is null.");
-
-            this.executeMethod = executeMethod;
         }
-
-        bool ICommand.CanExecute(object parameter) => CanExecute((T)parameter);
-
-        async void ICommand.Execute(object parameter) => await ExecuteAsync((T)parameter);
 
         public async Task ExecuteAsync(T parameter)
         {
@@ -34,5 +28,7 @@ namespace Rxmvvm.Commands
                 await executeMethod(parameter);
             }
         }
+
+        protected override async void Execute(object parameter) => await ExecuteAsync((T)parameter);
     }
 }
