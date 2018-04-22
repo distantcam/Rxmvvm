@@ -21,10 +21,10 @@ namespace Rxmvvm
             new ObservableCommand(canExecuteObservable, _ => action());
 
         public static IObservableCommand ToCommandAsync(this IObservable<PropertyChangedData<bool>> canExecuteObservable, Func<object, Task> action) =>
-            new ObservableCommand(canExecuteObservable.Select(pc => pc.After), action);
+            new ObservableCommand(canExecuteObservable.Select(pc => pc.Value), action);
 
         public static IObservableCommand ToCommandAsync(this IObservable<PropertyChangedData<bool>> canExecuteObservable, Func<Task> action) =>
-            new ObservableCommand(canExecuteObservable.Select(pc => pc.After), _ => action());
+            new ObservableCommand(canExecuteObservable.Select(pc => pc.Value), _ => action());
 
         public static IObservableCommand ToCommand(this IObservable<bool> canExecuteObservable, Action<object> action) =>
             new ObservableCommand(canExecuteObservable, p => { action(p); return Task.FromResult(0); });
@@ -33,10 +33,10 @@ namespace Rxmvvm
             new ObservableCommand(canExecuteObservable, _ => { action(); return Task.FromResult(0); });
 
         public static IObservableCommand ToCommand(this IObservable<PropertyChangedData<bool>> canExecuteObservable, Action<object> action) =>
-            new ObservableCommand(canExecuteObservable.Select(pc => pc.After), p => { action(p); return Task.FromResult(0); });
+            new ObservableCommand(canExecuteObservable.Select(pc => pc.Value), p => { action(p); return Task.FromResult(0); });
 
         public static IObservableCommand ToCommand(this IObservable<PropertyChangedData<bool>> canExecuteObservable, Action action) =>
-            new ObservableCommand(canExecuteObservable.Select(pc => pc.After), _ => { action(); return Task.FromResult(0); });
+            new ObservableCommand(canExecuteObservable.Select(pc => pc.Value), _ => { action(); return Task.FromResult(0); });
 
         public static IDisposable Execute<T>(this IObservable<T> observable, System.Windows.Input.ICommand command) =>
             observable.Do(t => { if (command.CanExecute(t)) command.Execute(t); }).Subscribe();

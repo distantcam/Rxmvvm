@@ -68,15 +68,12 @@ namespace Rxmvvm
             Interlocked.Exchange(ref errorChanged, null)?.OnCompleted();
         }
 
-        public void AddChildDisposable(IDisposable subscription)
-        {
-            disposables.Add(subscription);
-        }
+        public void AddChildDisposable(IDisposable subscription) => disposables.Add(subscription);
 
-        protected void OnPropertyChanged(string propertyName, object before, object after)
+        protected void OnPropertyChanged(string propertyName, object value)
         {
             if (ChangeNotificationEnabled)
-                changed.OnNext(new PropertyChangedData(propertyName, before, after));
+                changed.OnNext(new PropertyChangedData(propertyName, value));
         }
 
         public void SetDataError(string propertyName, string error) =>
