@@ -14,6 +14,7 @@
     <PackageReference Include="gitversiontask" Version="3.6.5">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
     <PackageReference Include="System.Reactive" Version="3.1.1" />
   </ItemGroup>
 

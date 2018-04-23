@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reflection;
 using System.Threading;
 
 namespace Rxmvvm
@@ -18,6 +21,8 @@ namespace Rxmvvm
         private IObservable<DataErrorChanged> whenErrorChanged;
 
         private CompositeDisposable disposables;
+
+        private Lazy<ImmutableDictionary<string, PropertyInfo>> staticProperties;
 
         public BindableObject()
         {
@@ -47,6 +52,15 @@ namespace Rxmvvm
                     }
                     errorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(args.PropertyName));
                 });
+
+            staticProperties = new Lazy<ImmutableDictionary<string, PropertyInfo>>(() =>
+            {
+                var type = GetType();
+                return ImmutableDictionary<string, PropertyInfo>.Empty.AddRange(
+                    type.GetMembers(BindingFlags.Public | BindingFlags.Instance)
+                    .OfType<PropertyInfo>()
+                    .ToDictionary(m => m.Name));
+            });
         }
 
         IObservable<PropertyChangedData> IObservablePropertyChanged.Changed => whenChanged;
